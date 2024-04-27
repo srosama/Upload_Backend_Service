@@ -1,0 +1,10 @@
+{
+    "type": "moduleSER",
+    "name": "starter-kit",
+    "version": "1.0.0",
+    "main": "server.js",
+    "dependencies": {
+      "your-dependencies": "^1.0.0"
+    }
+  }
+  

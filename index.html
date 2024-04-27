@@ -1,11 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Files</title>
+    <title>Enter Your Name</title>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    
+    <div id="fullScreenInputContainer">
+        <input type="text" id="fullScreenInput" placeholder="Enter Your Name...">
+    </div>
+
+    <script>
+        const nameInput = document.getElementById("fullScreenInput");
+        nameInput.addEventListener("keypress", async function(event) {
+            if (event.key === "Enter") {
+                const name = nameInput.value.trim();
+                if (name !== "") {
+                    try {
+                        await fetch("http://localhost:3000/add_name", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ name: name })
+                        });
+                        window.open("http://localhost:3000/main");
+                        document.getElementById("fullScreenInputContainer").style.background = "none";
+                        nameInput.style.display = "none";
+                    } catch (error) {
+                        console.error("Error:", error);
+                    }
+                }
+            }
+        });
+    </script>
+
 </body>
+
 </html>

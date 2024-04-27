@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File uploader</title>
+
+</head>
+
+<body>
+
+
+
+
+    <div id="container">
+        <h1>My File Uploader</h1>
+        <h1>Hello  <span id="getNameSS"></span>👋</h1> 
+        <input type='file' id='f' style="justify-content: center;"> <br> <br>
+        <button id='btnUpload' style="justify-content: center; ">Read & Upload</button>
+        <div id='divOutput'></div>
+    </div>
+
+
+
+
+
+
+
+    <script>
+        const btnUpload = document.getElementById("btnUpload"); // Submit button
+        const divOutput = document.getElementById("divOutput"); // Progrss
+        const f = document.getElementById("f"); // Input
+        fetch("http://localhost:3000/get_names", {
+    method: "GET"
+}).then(response => {
+    // Check if response is OK
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    // Parse response as JSON
+    return response.json();
+}).then(data => {
+    // Extract the name property
+    const name = data[0].name;
+    // Set innerHTML of element with id "getNameSS" to the extracted name
+    document.getElementById("getNameSS").innerHTML = name;
+}).catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+});
+
+        btnUpload.addEventListener("click", () => {
+
+            const fileReader = new FileReader();
+            const theFile = f.files[0];
+            fileReader.onload = async ev => {
+
+                const CHUNK_SIZE = 5000;
+                const chunkCount = ev.target.result.byteLength / CHUNK_SIZE;
+
+                console.log("Read successfully");
+                const fileName = Math.random() * 1000 + theFile.name;
+                for (let chunkId = 0; chunkId < chunkCount + 1; chunkId++) {
+                    const chunk = ev.target.result.slice(chunkId * CHUNK_SIZE, chunkId * CHUNK_SIZE + CHUNK_SIZE);
+                    await fetch("http://localhost:3000/upload", {
+                        "method": "POST",
+                        "headers": {
+                            "content-type": "application/octet-stream",
+                            "content-length": chunk.length,
+                            "file-name": fileName
+                        },
+                        "body": chunk
+                    })
+                    divOutput.textContent = Math.round(chunkId * 100 / chunkCount, 0) + "%"
+
+                }
+                console.log(ev.target.result.byteLength);
+            }
+            fileReader.readAsArrayBuffer(theFile);
+        })
+
+    </script>
+</body>
+
+</html>
